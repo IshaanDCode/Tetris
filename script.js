@@ -13,6 +13,8 @@ function generateSequence(){
         const rand = getRandomInt(0, sequence.lenght - 1);
         const name = sequence.splice(rand,1)[0];
         tetrominoSequence.push(name);
-        
+
     }
 }
+
+//get the next tetromino in the sequence
