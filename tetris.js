@@ -115,8 +115,9 @@ function rotatePiece() {
     while (isCollision()) {
         currentPiece.x += offset;
         offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > currentPiece.shape[0].length) {
+        if (Math.abs(offset) > currentPiece.shape[0].length) {
             currentPiece.shape = originalShape;
+            currentPiece.x = Math.min(Math.max(currentPiece.x, 0), cols - currentPiece.shape[0].length);
             return;
         }
     }
