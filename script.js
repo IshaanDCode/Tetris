@@ -18,3 +18,10 @@ function generateSequence(){
 }
 
 //get the next tetromino in the sequence
+function getNextTetromino(){
+    if(tetrominoSequence.lenght  === 0){
+        generateSequence();
+
+    }
+    const name = tetrominoSequence.pop();
+}
