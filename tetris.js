@@ -3,6 +3,7 @@ const context = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const levelElement = document.getElementById('level');
 const linesElement = document.getElementById('lines');
+const rotateButton = document.getElementById('rotate-button');
 const restartButton = document.getElementById('restart-button');
 const grid = 30;
 const rows = 20;
@@ -190,13 +191,21 @@ function gameLoop() {
 document.addEventListener('keydown', event => {
     if (event.keyCode === 37) { // Left arrow key
         movePiece(-1, 0);
+        event.preventDefault(); // Prevent default scroll behavior
     } else if (event.keyCode === 39) { // Right arrow key
         movePiece(1, 0);
+        event.preventDefault(); // Prevent default scroll behavior
     } else if (event.keyCode === 40) { // Down arrow key
         movePiece(0, 1);
+        event.preventDefault(); // Prevent default scroll behavior
     } else if (event.keyCode === 38) { // Up arrow key
         rotatePiece();
+        event.preventDefault(); // Prevent default scroll behavior
     }
+});
+
+rotateButton.addEventListener('click', () => {
+    rotatePiece();
 });
 
 restartButton.addEventListener('click', () => {
