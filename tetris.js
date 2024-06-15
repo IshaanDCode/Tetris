@@ -97,14 +97,18 @@ function movePiece(dx, dy) {
 }
 
 function rotatePiece() {
-    const tempShape = currentPiece.shape.map((row, y) =>
-        row.map((value, x) => currentPiece.shape[currentPiece.shape.length - 1 - x][y])
-    );
-
-    const originalX = currentPiece.x;
     const originalShape = currentPiece.shape;
-
-    currentPiece.shape = tempShape;
+    const N = currentPiece.shape.length;
+    // Transpose the shape matrix
+    for (let i = 0; i < N; i++) {
+        for (let j = i; j < N; j++) {
+            [currentPiece.shape[i][j], currentPiece.shape[j][i]] = [currentPiece.shape[j][i], currentPiece.shape[i][j]];
+        }
+    }
+    // Reverse each row to rotate 90 degrees clockwise
+    for (let i = 0; i < N; i++) {
+        currentPiece.shape[i].reverse();
+    }
 
     let offset = 0;
     while (isCollision()) {
@@ -112,7 +116,6 @@ function rotatePiece() {
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (offset > currentPiece.shape[0].length) {
             currentPiece.shape = originalShape;
-            currentPiece.x = originalX;
             return;
         }
     }
