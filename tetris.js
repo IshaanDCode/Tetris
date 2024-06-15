@@ -1,34 +1,52 @@
 const canvas = document.getElementById('game-board');
 const context = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
+const levelElement = document.getElementById('level');
+const linesElement = document.getElementById('lines');
+const restartButton = document.getElementById('restart-button');
 const grid = 30;
 const rows = 20;
 const cols = 10;
 let board = Array.from({ length: rows }, () => Array(cols).fill(0));
 let score = 0;
+let lines = 0;
+let level = 1;
+let dropInterval = 1000;
+let lastDropTime = Date.now();
 
 const colors = ['#00f0f0', '#f0f000', '#f0a000', '#a000f0', '#0000f0', '#00f000', '#f00000'];
 
-const pieces = [
-    [1, 1, 1, 1], // I
-    [1, 1, 1, 0, 1], // T
-    [1, 1, 0, 0, 1, 1], // O
-    [1, 1, 0, 1, 1], // S
-    [0, 1, 1, 1, 1], // Z
-    [1, 1, 1, 1, 0, 1, 1], // L
-    [1, 1, 1, 0, 0, 1, 1], // J
+const shapes = [
+    [[1, 1, 1, 1]], // I
+    [[1, 1, 1], [0, 1]], // T
+    [[1, 1], [1, 1]], // O
+    [[0, 1, 1], [1, 1]], // S
+    [[1, 1, 0], [0, 1, 1]], // Z
+    [[1, 1, 1], [1]], // L
+    [[1, 1, 1], [0, 0, 1]] // J
 ];
 
-let currentPiece = { shape: [], x: 0, y: 0, color: '' };
+let currentPiece;
 
 function resetPiece() {
-    const random = Math.floor(Math.random() * pieces.length);
-    currentPiece.shape = pieces[random].map((block, index) => {
-        return block ? { x: index % 2, y: Math.floor(index / 2) } : null;
-    }).filter(block => block !== null);
-    currentPiece.x = Math.floor(cols / 2) - 1;
-    currentPiece.y = 0;
-    currentPiece.color = colors[random];
+    const random = Math.floor(Math.random() * shapes.length);
+    currentPiece = {
+        shape: shapes[random],
+        color: colors[random],
+        x: Math.floor(cols / 2) - 1,
+        y: 0
+    };
+    if (isCollision()) {
+        alert('Game Over');
+        board = Array.from({ length: rows }, () => Array(cols).fill(0));
+        score = 0;
+        lines = 0;
+        level = 1;
+        dropInterval = 1000;
+        updateScore();
+        updateLevel();
+        updateLines();
+    }
 }
 
 function drawBoard() {
@@ -46,9 +64,13 @@ function drawBoard() {
 
 function drawPiece() {
     context.fillStyle = currentPiece.color;
-    currentPiece.shape.forEach(block => {
-        context.fillRect((currentPiece.x + block.x) * grid, (currentPiece.y + block.y) * grid, grid, grid);
-        context.strokeRect((currentPiece.x + block.x) * grid, (currentPiece.y + block.y) * grid, grid, grid);
+    currentPiece.shape.forEach((row, dy) => {
+        row.forEach((value, dx) => {
+            if (value) {
+                context.fillRect((currentPiece.x + dx) * grid, (currentPiece.y + dy) * grid, grid, grid);
+                context.strokeRect((currentPiece.x + dx) * grid, (currentPiece.y + dy) * grid, grid, grid);
+            }
+        });
     });
 }
 
@@ -62,18 +84,14 @@ function movePiece(dx, dy) {
         if (dy !== 0) {
             mergePiece();
             resetPiece();
-            if (isCollision()) {
-                alert('Game Over');
-                board = Array.from({ length: rows }, () => Array(cols).fill(0));
-                score = 0;
-                updateScore();
-            }
         }
     }
 }
 
 function rotatePiece() {
-    const tempShape = currentPiece.shape.map(block => ({ x: block.y, y: -block.x }));
+    const tempShape = currentPiece.shape.map((row, y) =>
+        row.map((value, x) => currentPiece.shape[currentPiece.shape.length - 1 - x][y])
+    );
     const originalX = currentPiece.x;
     currentPiece.shape = tempShape;
     if (isCollision()) {
@@ -81,47 +99,82 @@ function rotatePiece() {
         if (isCollision()) {
             currentPiece.x = originalX + 1;
             if (isCollision()) {
-                currentPiece.shape = tempShape.map(block => ({ x: -block.y, y: block.x }));
+                currentPiece.shape = tempShape.map((row, y) =>
+                    row.map((value, x) => currentPiece.shape[x][currentPiece.shape.length - 1 - y])
+                );
             }
         }
     }
 }
 
 function mergePiece() {
-    currentPiece.shape.forEach(block => {
-        board[currentPiece.y + block.y][currentPiece.x + block.x] = currentPiece.color;
+    currentPiece.shape.forEach((row, dy) => {
+        row.forEach((value, dx) => {
+            if (value) {
+                board[currentPiece.y + dy][currentPiece.x + dx] = currentPiece.color;
+            }
+        });
     });
 
-    board = board.filter(row => row.some(value => value === 0)).concat(
-        Array.from({ length: rows - board.filter(row => row.every(value => value !== 0)).length }, () => Array(cols).fill(0))
-    );
+    let clearedRows = 0;
+    board = board.filter(row => {
+        if (row.every(value => value !== 0)) {
+            clearedRows++;
+            return false;
+        }
+        return true;
+    });
 
-    score += 10;
+    for (let i = 0; i < clearedRows; i++) {
+        board.unshift(Array(cols).fill(0));
+    }
+
+    score += clearedRows * 10;
+    lines += clearedRows;
+    if (lines >= level * 10) {
+        level++;
+        dropInterval -= 100;
+    }
+
     updateScore();
+    updateLines();
+    updateLevel();
 }
 
 function updateScore() {
     scoreElement.innerText = score;
 }
 
+function updateLines() {
+    linesElement.innerText = lines;
+}
+
+function updateLevel() {
+    levelElement.innerText = level;
+}
+
 function isCollision() {
-    return currentPiece.shape.some(block => {
-        const newX = currentPiece.x + block.x;
-        const newY = currentPiece.y + block.y;
-        return (
-            newX < 0 ||
-            newX >= cols ||
-            newY >= rows ||
-            board[newY] && board[newY][newX]
-        );
-    });
+    return currentPiece.shape.some((row, dy) =>
+        row.some((value, dx) => {
+            const newX = currentPiece.x + dx;
+            const newY = currentPiece.y + dy;
+            return (
+                value &&
+                (newX < 0 || newX >= cols || newY >= rows || board[newY][newX])
+            );
+        })
+    );
 }
 
 function gameLoop() {
-    movePiece(0, 1);
+    const now = Date.now();
+    if (now - lastDropTime > dropInterval) {
+        movePiece(0, 1);
+        lastDropTime = now;
+    }
     drawBoard();
     drawPiece();
-    setTimeout(gameLoop, 500);
+    requestAnimationFrame(gameLoop);
 }
 
 document.addEventListener('keydown', event => {
@@ -136,6 +189,20 @@ document.addEventListener('keydown', event => {
     }
 });
 
+restartButton.addEventListener('click', () => {
+    board = Array.from({ length: rows }, () => Array(cols).fill(0));
+    score = 0;
+    lines = 0;
+    level = 1;
+    dropInterval = 1000;
+    updateScore();
+    updateLines();
+    updateLevel();
+    resetPiece();
+});
+
 resetPiece();
 updateScore();
+updateLines();
+updateLevel();
 gameLoop();

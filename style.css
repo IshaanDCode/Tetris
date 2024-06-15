@@ -21,4 +21,18 @@ body {
 
 #score-board {
     margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#score-board h2 {
+    margin: 10px 0;
+}
+
+#restart-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
