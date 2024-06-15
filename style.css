@@ -26,11 +26,11 @@ body {
     align-items: center;
 }
 
-#score-board h2, #score-board p {
+#score-board h2 {
     margin: 10px 0;
 }
 
-#restart-button {
+#rotate-button, #restart-button {
     margin-top: 10px;
     padding: 10px 20px;
     font-size: 16px;
