@@ -99,17 +99,18 @@ function movePiece(dx, dy) {
 function rotatePiece() {
     const originalShape = currentPiece.shape;
     const N = currentPiece.shape.length;
-    // Transpose the shape matrix
+    // Create a new empty matrix for the rotated shape
+    let rotatedShape = Array.from({ length: N }, () => Array(N).fill(0));
+    // Rotate the shape matrix 90 degrees clockwise
     for (let i = 0; i < N; i++) {
-        for (let j = i; j < N; j++) {
-            [currentPiece.shape[i][j], currentPiece.shape[j][i]] = [currentPiece.shape[j][i], currentPiece.shape[i][j]];
+        for (let j = 0; j < N; j++) {
+            rotatedShape[j][N - 1 - i] = currentPiece.shape[i][j];
         }
     }
-    // Reverse each row to rotate 90 degrees clockwise
-    for (let i = 0; i < N; i++) {
-        currentPiece.shape[i].reverse();
-    }
 
+    currentPiece.shape = rotatedShape;
+
+    // Check for collision after rotation
     let offset = 0;
     while (isCollision()) {
         currentPiece.x += offset;
