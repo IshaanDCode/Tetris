@@ -22,7 +22,7 @@ const shapes = [
     [[1, 1], [1, 1]], // O
     [[0, 1, 1], [1, 1]], // S
     [[1, 1, 0], [0, 1, 1]], // Z
-    [[1, 1, 1], [1]], // L
+    [[1, 1, 1], [1, 0, 0]], // L
     [[1, 1, 1], [0, 0, 1]] // J
 ];
 
@@ -99,17 +99,20 @@ function rotatePiece() {
     const tempShape = currentPiece.shape.map((row, y) =>
         row.map((value, x) => currentPiece.shape[currentPiece.shape.length - 1 - x][y])
     );
+
     const originalX = currentPiece.x;
+    const originalShape = currentPiece.shape;
+
     currentPiece.shape = tempShape;
-    if (isCollision()) {
-        currentPiece.x = originalX - 1;
-        if (isCollision()) {
-            currentPiece.x = originalX + 1;
-            if (isCollision()) {
-                currentPiece.shape = tempShape.map((row, y) =>
-                    row.map((value, x) => currentPiece.shape[x][currentPiece.shape.length - 1 - y])
-                );
-            }
+
+    let offset = 0;
+    while (isCollision()) {
+        currentPiece.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > currentPiece.shape[0].length) {
+            currentPiece.shape = originalShape;
+            currentPiece.x = originalX;
+            return;
         }
     }
 }
@@ -185,13 +188,13 @@ function gameLoop() {
 }
 
 document.addEventListener('keydown', event => {
-    if (event.keyCode === 37) {
+    if (event.keyCode === 37) { // Left arrow key
         movePiece(-1, 0);
-    } else if (event.keyCode === 39) {
+    } else if (event.keyCode === 39) { // Right arrow key
         movePiece(1, 0);
-    } else if (event.keyCode === 40) {
+    } else if (event.keyCode === 40) { // Down arrow key
         movePiece(0, 1);
-    } else if (event.keyCode === 38) {
+    } else if (event.keyCode === 38) { // Up arrow key
         rotatePiece();
     }
 });
