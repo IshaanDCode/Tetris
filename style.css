@@ -7,7 +7,6 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
-    overflow: hidden; /* Prevent scrolling */
 }
 
 #game-container {
@@ -27,11 +26,11 @@ body {
     align-items: center;
 }
 
-#score-board h2 {
+#score-board h2, #score-board p {
     margin: 10px 0;
 }
 
-#rotate-button, #restart-button {
+#restart-button {
     margin-top: 10px;
     padding: 10px 20px;
     font-size: 16px;
