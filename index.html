@@ -3,11 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris</title>
-    <link rel="stylesheet" href ="style.css">
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
 </head>
 <body>
-    <canvas width ="320" height ="640" id="name"></canvas>
-    <scriptr src = "script.js"></script>
+    <header>
+        <div class="logo">
+            <img src="resources/logo.png" alt="Game Logo">
+            <hr>
+        </div>
+        <div class="scores">
+            <div class="score">
+                <span>Score:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="lines">
+                <span>Lines:</span>
+                <span id="lines">0</span>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="game-container">
+            <img src="resources/background.png" alt="Game Background">
+            <canvas id="game-canvas"></canvas>
+        </div>
+    </main>
+    <footer>
+        <script src="script.js"></script>
+    </footer>
 </body>
 </html>

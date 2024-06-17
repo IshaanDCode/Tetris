@@ -1,19 +1,51 @@
-html, body{
-    height: 100%;
+body {
     margin: 0;
-
+    padding: 0;
+    background-color: #000; /* Black background */
+    text-align: center;
+    color: #fff; /* White text color */
+    font-family: "Lucida Console", "Courier New", monospace; /* Use monospace font */
 }
 
-body{
-    background-color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+#wrapper {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center align items horizontally */
+    align-items: flex-start; /* Align items to the top */
+    margin: 20px;
 }
 
-
-canvas{
+#left-div {
+    margin: 0 20px 20px; /* Adjust margins */
+    padding: 20px;
     border: 1px solid white;
-    
+    width: 286px;
+    height: 572.325px; /* Keep the height */
+    text-align: left; /* Align text to the left */
+}
+
+#logo {
+    width: 160px;
+    margin-bottom: 15px;
+}
+
+#game-container {
+    position: relative;
+}
+
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+#game-canvas {
+    position: relative; /* Relative positioning for canvas */
+}
+
+#score-div,
+#lines-div {
+    font-size: 23px;
+    font-weight: bold;
+    margin: 15px 0;
 }
